@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Money Accounting</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="../js/jquery-1.9.1.min.js"></script>
+<style type="text/css">
+	  	.form-inline{
+	  		position:absolute;
+	  		right:0px;
+	  	}
+	  	#add_button{
+	  		position:relative;
+	  		left:200px;
+	  		top:5px;
+	  	}
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+	  /* Let the date input to show today's date */
+	  var today = new Date();
+	  var y = today.getFullYear();
+	  var m = today.getMonth()+1;
+	  var d = today.getDate();
+	  if (m < 10) m = "0" + m;
+	  if (d < 10) d = "0" + d;
+	  var format_date = y+"-"+m+"-"+d;
+	  console.log(format_date);
+	  $("#add_date").val(format_date);
+	  
+	  /* Let the submit button to have click function */
+	  $("#add_button").click(function(){
+			post_data = {
+					date_consumed:$("#add_date").val(),
+					amount:$("#add_amount").val(),
+					item:$("#add_item").val(),
+					shop_name:$("#add_shop_name").val(),
+					category:$("#add_category").val(),
+					payment:$("#add_payment").val(),
+					notes:$("#add_notes").val()
+			}
+			console.log(post_data)
+			$.ajax({
+				type:"POST",
+				url:"/money/add.do",
+				data:post_data,
+				success:location.reload(true)
+			})
+			
+			/* After successfully posted, we set the value of the inputs to be null */
+					$("#add_amount").val(null),
+					$("#add_item").val(null),
+					$("#add_shop_name").val(null),
+					$("#add_category").val(null),
+					$("#add_payment").val(null),
+					$("#add_notes").val(null)
+					
+		})
+	
+	  /* Let the table to show all the data of former days */	
+	  showSortedAll();
+	
+})	
+
+/* show all the data from the database which is ordered by data_consumed */
+function showSortedAll(){
+	$.ajax({
+		type:"GET",
+		url:"/money/getAllList.do",
+	    success: function(result){
+			    console.log(result);
+			    //innerHTML of the tbody
+			    var innerHTML = "";
+			    
+			    var allData = result.data;
+			    //console.log(allData.length);
+			    
+			    /* first loop to seperate between different dates */
+			    for(var i=0;i<allData.length;i++){
+			    	//console.log(allData[i]);
+			    	var one_day_items = allData[i]
+			    	var date_consumed = one_day_items[0].date_consumed;
+			    	//console.log(date_consumed);
+			    	
+			    	/* Split the sum into integer and decimal two parts */
+			    	var sum_int = 0;
+			    	var sum_deci1 = 0;
+			    	var sum_deci2 = 0;
+			    	
+			    	for(var j=0;j<one_day_items.length;j++){
+			    		var amount_string = one_day_items[j].amount+"";
+			    		sum_int += parseInt(amount_string.split(".")[0]);
+			    		var deci = amount_string.split(".")[1];
+			    		
+			    		console.log(deci);
+			    		
+			    		if(deci!=null){
+			    			var deci_arr = deci.split("");
+			    			console.log(deci_arr)
+			    			
+			    			if(deci_arr[0]!=null){
+			    				var deci1 = parseInt(deci_arr[0]);
+			    				console.log("deci1= "+deci1)
+			    				if(deci1!=0){
+			    					sum_deci1 += deci1;
+			    				}
+			    			}
+			    			
+			    			if(deci_arr[1]!=null){
+			    				var deci2 = parseInt(deci_arr[1]);
+			    				console.log("deci2= "+deci2)
+			    				if(deci2!=0){
+			    					sum_deci2 += deci2;
+			    				}
+			    			}
+			    		}
+			    	}
+			    	
+			    	if(sum_deci2>=10){
+			    	    var advance = Math.floor(sum_deci2/10);
+						sum_deci1+= advance;
+						sum_deci2 = sum_deci2 - 10*advance;
+			    	}
+			    	
+			    	if(sum_deci1>=10){
+			    	    var advance = Math.floor(sum_deci1/10);
+						sum_int += advance;
+						sum_deci1 = sum_deci1 - 10*advance;
+			    	}
+			    	
+			    	console.log("sum_deci1= "+sum_deci1);
+			    	console.log("sum_deci2= "+sum_deci2);
+			    	
+			    	var sum_line = '<tr class="table-info"><td><a data-toggle="collapse" href=".trSet'+i+'">'+date_consumed+'</a></td><td colspan="7" style="text-align:right;">Sum: -$'+sum_int+"."+sum_deci1+sum_deci2+'</td></tr>';
+			    	innerHTML += sum_line;
+			    	
+			    	/* second loop to insert all the line of the date  */
+			    	for(var j=0;j<one_day_items.length;j++){
+			    		amount = one_day_items[j].amount;
+			    		item = one_day_items[j].item;
+			    		shop_name = one_day_items[j].shop_name;
+			    		category = one_day_items[j].category;
+			    		payment = one_day_items[j].payment;
+			    		notes = one_day_items[j].notes;
+			    		id = one_day_items[j].id;
+			    		innerHTML += '<tr class="trSet'+i+' collapse show"><td></td><td>-$'+amount+'</td><td>'+item+'</td><td>'+shop_name+'</td><td>'+category+'</td><td>'+payment+'</td><td>'+notes+'</td><td><button id="bt-'+id+'" type="button" onclick="click_delete('+id+')">Delete</button></td></tr>';
+			    	}
+			    	
+			    }
+			    
+			    /* Set the generated html into the main_content */
+			    $("#main_content").html(innerHTML);
+	    }
+	})
+}
+
+function click_delete(a){
+	console.log(parseInt(a));
+	$.ajax({
+		type:"POST",
+		url:"/money/delete.do",
+		data:{id:parseInt(a)},
+		success:location.reload(true)
+	})
+}
+		  	  
+</script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <!-- Brand -->
+  <a class="navbar-brand" href="#">Main</a>
+
+  <!-- Links -->
+  <ul class="navbar-nav">
+    <li class="nav-item">
+      <a class="nav-link" href="./money_charts2.html">Charts</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="./gesture.html">Analysis</a>
+    </li>
+  </ul>
+
+</nav>
+
+<table class="table">
+   <thead class="thead-light">
+     <tr>
+       <th>Date</th>
+       <th>Amount</th>
+       <th>Item</th>
+       <th>Shop Name</th>
+       <th>Category</th>
+       <th>Payment</th>
+       <th>Notes</th>
+       <th>Delete</th>
+     </tr>
+   </thead>
+   
+   
+   <tbody>
+   
+   <tr>
+	 	 <td><input type="date" class="form-control" id="add_date" name="date_consumed"></td>
+	     <td><input type="number" class="form-control" id="add_amount" name="amount"></td>
+	     <td><input type="text" class="form-control" id="add_item" name="item"></td>
+	     <td><input type="text" class="form-control" id="add_shop_name" name="shop_name"></td>
+	     <td>
+	     	<select class="form-control" id="add_category" name="category">
+	     		<option>Meal</option>
+	     		<option>Clothing</option>
+	     		<option>Study</option>
+	     		<option>Entertainment</option>
+	     		<option>Transport</option>
+	     		<option>Grocery</option>
+	     		<option>Phone</option>
+	     		<option>Activity</option>
+	     		<option>Other</option>
+	     	</select>
+	     </td>
+	     <td>
+	     	<select class="form-control" id="add_payment" name="payment">
+	     		<option>Credit Card</option>
+	     		<option>Debit Card</option>
+	     		<option>Cash</option>
+	     		<option>McGill Card</option>
+	     	</select>
+	     </td>
+	     <td><input type="text" class="form-control" id="add_notes" name="notes"><input type="submit" value="Add" id="add_button" class="btn btn-primary"></td>
+   </tr>
+   
+   </tbody>
+   
+   <tbody id="main_content">
+     <tr class="table-info">
+    	<td><a data-toggle="collapse" href="#demo">2019-10-18</a></td>
+    	<td colspan="6">Sum: -$90</td>
+     </tr>
+	     <tr>
+	       <td></td>
+	       <td>-$30</td>
+	       <td>Hotpot</td>
+	       <td>Panda Hotpot</td>
+	       <td>Meal</td>
+	       <td>Cash</td>
+	       <td></td>
+	       <td><button type="button"  ></button>  </td>
+	     </tr>
+	     <tr>
+	       <td></td>
+	       <td>-$10</td>
+	       <td>Burger</td>
+	       <td>Burger King</td>
+	       <td>Meal</td>
+	       <td>Credit Card</td>
+	       <td>Two whopper and a Coke</td>
+	     </tr>
+	     <tr>
+	       <td></td>
+	       <td>-$55</td>
+	       <td>Puma White Shoes</td>
+	       <td>Winners</td>
+	       <td>Clothing</td>
+	       <td>Credit Card</td>
+	       <td>Pretty cheap for such good shoes</td>
+	       <td></td>
+	     </tr>
+   </tbody>
+ </table>
+
+</body>
+</html>

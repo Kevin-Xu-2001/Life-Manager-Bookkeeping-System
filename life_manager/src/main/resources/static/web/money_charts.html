@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+<meta charset="UTF-8">
+<title>Money Charts</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="../js/jquery-1.9.1.min.js"></script>
+<style type="text/css">
+	  	.form-inline{
+	  		position:absolute;
+	  		right:0px;
+	  	}
+	  	#add_button{
+	  		position:relative;
+	  		left:200px;
+	  		top:5px;
+	  	}
+</style>
+</head>
+
+
+
+<body style="height: 100%;margin: 0">
+
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <!-- Brand -->
+  <a class="navbar-brand" href="./money_manager.html">Main</a>
+
+  <!-- Links -->
+  <ul class="navbar-nav">
+    <li class="nav-item">
+      <a class="nav-link" href="./money_charts.html">Charts</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Analysis</a>
+    </li>
+  </ul>
+  <!-- Searching bar -->
+  <form class="form-inline" action="/action_page.php">
+	 <input class="form-control mr-sm-2" type="text" placeholder="Search">
+	 <button class="btn btn-success" type="submit">Search</button>
+  </form>
+</nav>
+
+
+
+<div id="container" style="height: 100%"></div>
+<script type="text/javascript" src="../js/echarts.js"></script>
+<script type="text/javascript">
+var dom = document.getElementById("container");
+var myChart = echarts.init(dom);
+var app = {};
+option = null;
+//the size of each square box
+var cellSize = [100, 100];
+//the redius of each pie chart
+var pieRadius = 40;
+
+//This function to get the day table of a month(or for a selected time period)
+function getVirtulData() {
+    var date = +echarts.number.parseDate('2019-11-01');
+    var end = +echarts.number.parseDate('2019-12-01');
+    var dayTime = 3600 * 24 * 1000;
+    var data = [];
+    for (var time = date; time < end; time += dayTime) {
+        data.push([
+            echarts.format.formatTime('yyyy-MM-dd', time),
+            Math.floor(Math.random() * 10000)
+        ]);
+    }
+    return data;
+}
+
+//give chosen value to scatterData
+var scatterData = getVirtulData();
+
+
+function getPieSeries(scatterData, chart) {
+    return echarts.util.map(scatterData, function (item, index) {
+        var center = chart.convertToPixel('calendar', item);
+        return {
+            id: index + 'pie',
+            type: 'pie',
+            center: center,
+            label: {
+                normal: {
+                    formatter: '{c}',
+                    position: 'inside'
+                }
+            },
+            radius: pieRadius,
+            data: [
+                {name: '工作', value: Math.round(Math.random() * 24)},
+                {name: '娱乐', value: Math.round(Math.random() * 24)},
+                {name: '睡觉', value: Math.round(Math.random() * 24)}
+            ]
+        };
+    });
+}
+
+//
+function getPieSeriesUpdate(scatterData, chart) {
+    return echarts.util.map(scatterData, function (item, index) {
+        var center = chart.convertToPixel('calendar', item);
+        return {
+            id: index + 'pie',
+            center: center
+        };
+    });
+}
+
+//the option is to generate the table chart, with legend and data
+option = {
+    tooltip : {},
+    legend: {
+        data: ['工作', '娱乐', '睡觉'],
+        bottom: 30
+    },
+    calendar: {
+        top: 'middle',
+        left: 'center',
+        orient: 'vertical',
+        cellSize: cellSize,
+        
+        yearLabel: {
+            show: true,
+            margin:40,
+            textStyle: {
+                fontSize: 50
+            }
+        },
+        //the day label about the boxes
+        dayLabel: {
+            margin: 20,
+            firstDay: 1,
+            nameMap: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+        },
+        monthLabel: {
+            show: true,
+            margin:40,
+            textStyle: {
+                fontSize: 50
+            }
+        },
+        range: ['2019-11']
+    },
+    //insert the generated data into the calendar box
+    series: [{
+        id: 'label',
+        type: 'scatter',
+        coordinateSystem: 'calendar',
+        symbolSize: 1,
+        label: {
+            normal: {
+                show: true,
+                formatter: function (params) {
+                    return echarts.format.formatTime('dd', params.value[0]);
+                },
+                offset: [-cellSize[0] / 2 + 10, -cellSize[1] / 2 + 10],
+                textStyle: {
+                    color: '#000',
+                    fontSize: 14
+                }
+            }
+        },
+        data: scatterData
+    }]
+};
+
+if (!app.inNode) {
+    var pieInitialized;
+    setTimeout(function () {
+        pieInitialized = true;
+        myChart.setOption({
+            series: getPieSeries(scatterData, myChart)
+        });
+    }, 10);
+
+    app.onresize = function () {
+        if (pieInitialized) {
+            myChart.setOption({
+                series: getPieSeriesUpdate(scatterData, myChart)
+            });
+        }
+    };
+};
+if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+}
+</script>
+
+
+
+</body>
+</html>
