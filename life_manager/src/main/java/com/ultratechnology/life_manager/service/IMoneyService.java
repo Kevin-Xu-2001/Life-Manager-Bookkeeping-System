@@ -20,10 +20,11 @@ public interface IMoneyService {
 	
 	
 	/**
-	 * Find all the data that is in the database
+	 * Find all the data that is under the specific user id
+	 * @param User id
 	 * @return
 	 */
-	List<List<Money>> findSortedByDateConsumed();
+	List<List<Money>> findSortedByDateConsumed(Integer uid);
 	
 	/**
 	 * delete the unused lines
@@ -35,13 +36,13 @@ public interface IMoneyService {
 	 * @param selectDate
 	 * @return
 	 */
-	List<Money> findMoneyByDate(String selectDate);
+	List<Money> findMoneyByDate(String selectDate,Integer uid);
 	
 	/**
 	 * find the money items in a specific month
 	 * @param selectDate
 	 * @return
 	 */
-	List<Money> findMoneyByMonth(String selectDate);
+	List<Money> findMoneyByMonth(String selectDate,Integer uid);
 	
 }

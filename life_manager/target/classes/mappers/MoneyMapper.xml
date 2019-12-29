@@ -10,28 +10,30 @@ parameterType="com.ultratechnology.life_manager.entity.Money"
 useGeneratedKeys="true" 
 keyProperty="id">
 INSERT INTO money_manager (
-date_consumed, year, month, day, weekday, amount, item, 
+uid, date_consumed, year, month, day, weekday, amount, item, 
 shop_name, category, payment, notes
 ) VALUES (
-#{date_consumed}, #{year}, #{month}, #{day}, #{weekday}, #{amount}, #{item}, #{shop_name}, #{category},
+#{uid}, #{date_consumed}, #{year}, #{month}, #{day}, #{weekday}, #{amount}, #{item}, #{shop_name}, #{category},
 #{payment}, #{notes}
 )
 </insert>
 
 
 <!-- Select all the consume data that exists -->
-<select id="findAll" resultType="com.ultratechnology.life_manager.entity.Money">
+<select id="findAll" parameterType="java.lang.Integer" resultType="com.ultratechnology.life_manager.entity.Money">
 SELECT 
 id, date_consumed, year, month, day, weekday, amount, item, 
 shop_name, category, payment, notes
 FROM
 money_manager
+WHERE
+uid = #{uid}
 ORDER BY
 date_consumed DESC
 </select>
 
 <!-- Input a string value of date, and get back the list of money in the selected date -->
-<select id="findByDate" parameterType="java.lang.String" resultType="com.ultratechnology.life_manager.entity.Money">
+<select id="findByDate" resultType="com.ultratechnology.life_manager.entity.Money">
 SELECT
 id, date_consumed, year, month, day, weekday, amount, item, 
 shop_name, category, payment, notes
@@ -39,6 +41,7 @@ FROM
 money_manager
 WHERE
 date_consumed=#{selectDate}
+AND uid=#{uid}
 </select>
 
 <!-- Input a number indicate the year and the month, and get back the list of money in the selected month -->
@@ -49,7 +52,7 @@ shop_name, category, payment, notes
 FROM
 money_manager
 WHERE
-year=#{year} AND month=#{month}
+year=#{year} AND month=#{month} AND uid=#{uid}
 ORDER BY
 date_consumed DESC
 </select>

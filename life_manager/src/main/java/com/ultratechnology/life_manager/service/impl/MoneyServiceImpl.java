@@ -68,8 +68,8 @@ public class MoneyServiceImpl implements IMoneyService{
 	 * @param selectDate
 	 * @return
 	 */
-	public List<Money> findMoneyByDate(String selectDate){
-		return moneyMapper.findByDate(selectDate);
+	public List<Money> findMoneyByDate(String selectDate,Integer uid){
+		return moneyMapper.findByDate(selectDate,uid);
 	}
 	
 	
@@ -78,7 +78,7 @@ public class MoneyServiceImpl implements IMoneyService{
 	 * @param selectDate
 	 * @return
 	 */
-	public List<Money> findMoneyByMonth(String selectDate){
+	public List<Money> findMoneyByMonth(String selectDate,Integer uid){
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		try {
 			Date date = format.parse(selectDate);
@@ -88,7 +88,7 @@ public class MoneyServiceImpl implements IMoneyService{
 			//never forget the MONTH value in calendar is 1 less than the actual month number
 			Integer month = calendar.get(Calendar.MONTH)+1;
 			
-			return moneyMapper.findByMonth(year, month);
+			return moneyMapper.findByMonth(year, month, uid);
 			
 		}catch (ParseException e) {
 			e.printStackTrace();
@@ -100,8 +100,8 @@ public class MoneyServiceImpl implements IMoneyService{
 	/**
 	 * find all the money data
 	 */
-	public List<Money> findSortedAll() {
-		List<Money> allResult = moneyMapper.findAll();
+	public List<Money> findSortedAll(Integer uid) {
+		List<Money> allResult = moneyMapper.findAll(uid);
 		Collections.sort(allResult, new sortByDateConsumed());
 		return allResult;
 	}
@@ -113,8 +113,8 @@ public class MoneyServiceImpl implements IMoneyService{
 	 * Find the list of date, which contains a list of money consumed
 	 * that day.
 	 */
-	public List<List<Money>> findSortedByDateConsumed(){
-		List<Money> sortedAll = findSortedAll();
+	public List<List<Money>> findSortedByDateConsumed(Integer uid){
+		List<Money> sortedAll = findSortedAll(uid);
 		
 		List<List<Money>> listOfList = new ArrayList<List<Money>>();
 		
@@ -126,7 +126,6 @@ public class MoneyServiceImpl implements IMoneyService{
 			Money thisMoney = sortedAll.get(i);
 			/**
 			 * ATTENTION: we should use "equals" to compare two Strings
-			 * 
 			 * If the next one of the Money has the same date_consumed with the current baseMoney, then:
 			 * 1.add this money into the list of current base
 			 */

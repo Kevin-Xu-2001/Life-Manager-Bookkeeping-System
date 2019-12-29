@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>User Sign Up</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="../js/jquery-1.9.1.min.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+<!--Custom styles-->
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+</head>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#add-btn").click(function(){
+		var pas = $("#password").val();
+		var confpas = $("#conf-password").val();
+		
+		if(pas != confpas){
+			alert("Confirm Password Incorrect! Please try again.")
+			return;
+		}
+		user_data = {
+				'username':$("#username").val(),
+				'password':pas,
+				'email':$("#email").val()
+		}
+		$.ajax({
+			type:"POST",
+			url:"/user/add.do",
+			data:user_data,
+			success:function(result){
+				alert("Successfully Registered!!");
+				window.location = "./login.html";
+			}
+		})
+	})
+})
+</script>
+
+<body>
+
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <!-- Brand -->
+  <a class="navbar-brand" href="./login.html">Login</a>
+</nav>
+
+<div class="container">
+	<div class="d-flex justify-content-center h-100">
+		<div class="card">
+			<div class="card-header">
+				<h3>Register</h3>
+				<div class="d-flex justify-content-end social_icon">
+					<span><i class="fab fa-facebook-square"></i></span>
+				</div>
+			</div>
+			<div class="card-body">
+				<form>
+					<div class="input-group form-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-user"></i></span>
+						</div>
+						<input id='username' type="text" class="form-control" placeholder="username">
+					</div>
+					<div class="input-group form-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-key"></i></span>
+						</div>
+						<input id='password' type="password" class="form-control" placeholder="password">
+					</div>
+					<div class="input-group form-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-key"></i></span>
+						</div>
+						<input id='conf-password' type="password" class="form-control" placeholder="confirm password">
+					</div>
+					<div class="input-group form-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-address-card"></i></span>
+						</div>
+						<input id='email' type="text" class="form-control" placeholder="email address">
+					</div>
+					
+					<div class="row align-items-center remember">
+						<input type="checkbox">Add me to the official email list
+					</div>
+					<div class="card-footer">
+						<div class="d-flex justify-content-center links">
+							( After subscription, you will receive our official weekly data report )
+						</div>
+						<div class="d-flex justify-content-center">
+							<a href="../docs/terms&privacy.txt">Terms & privacy statement</a>
+						</div>
+					</div>
+					<div class="form-group">
+						<input id="add-btn" type="button" value="Sign Up" class="btn float-right login_btn">
+					</div>
+				</form>
+			</div>
+			
+		</div>
+	</div>
+</div>
+</body>
+</html>

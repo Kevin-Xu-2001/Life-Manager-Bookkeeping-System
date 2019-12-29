@@ -32,22 +32,17 @@
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
   <!-- Brand -->
-  <a class="navbar-brand" href="./money_manager.html">Main</a>
+  <a id="user" class="navbar-brand" href="./money_manager.html"></a>
 
   <!-- Links -->
   <ul class="navbar-nav">
     <li class="nav-item">
-      <a class="nav-link" href="./money_charts2.html">Charts</a>
+      <a class="nav-link" href="./money_manager.html">Money Manager</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#">Analysis</a>
+      <a class="nav-link" href="./money_charts2.html">Money Charts</a>
     </li>
   </ul>
-  <!-- Searching bar -->
-  <form class="form-inline" action="/action_page.php">
-	 <input class="form-control mr-sm-2" type="text" placeholder="Search">
-	 <button class="btn btn-success" type="submit">Search</button>
-  </form>
 </nav>
 
 
@@ -79,8 +74,10 @@
 var today = new Date();
 var y = today.getFullYear();
 var m = today.getMonth()+1;
+var month_m = today.getMonth()+1;
 var today_d = today.getDate();
 if (m < 10) m = "0" + m;
+if (month_m < 10) month_m = "0" + month_m;
 if (today_d < 10) today_d = "0" + today_d;
 var format_date = y+"-"+m+"-"+today_d;
 console.log(format_date);
@@ -90,32 +87,31 @@ console.log(format_date);
 
 //add click action to buttons:
 $("#btn-last").click(function(){
-	console.log(today_d);
 	today_d=today_d-1;
 	format_date = y+"-"+m+"-"+today_d;
-	console.log(format_date);
+	//console.log(format_date);
 	load_data(y,m,today_d,format_date);
 })
 
 $("#btn-next").click(function(){
 	today_d=today_d+1;
 	format_date = y+"-"+m+"-"+today_d;
-	console.log(format_date);
+	//console.log(format_date);
 	load_data(y,m,today_d,format_date);
 })
 
 $("#month-last").click(function(){
-	m=m-1;
-	format_date = y+"-"+m+"-"+today_d;
+	month_m=month_m-1;
+	format_date = y+"-"+month_m+"-"+today_d;
 	console.log(format_date);
-	load_monthData(y,m,format_date);
+	load_monthData(y,month_m,format_date);
 })
 
 $("#month-next").click(function(){
-	m=m+1;
-	format_date = y+"-"+m+"-"+today_d;
+	month_m=month_m+1;
+	format_date = y+"-"+month_m+"-"+today_d;
 	console.log(format_date);
-	load_monthData(y,m,format_date);
+	load_monthData(y,month_m,format_date);
 })
 
 
@@ -124,6 +120,15 @@ $(document).ready(function(){
 	load_data(y,m,today_d,format_date);
 	//load default month data to be the data of this month
 	load_monthData(y,m,format_date);
+	/* Get the username from the session and display it on the top left*/
+	$.ajax({
+	 type:"GET",
+     url:"/user/getUname.do",
+     success:function(result){
+		 console.log(result)
+		 $("#user").html(result.message)
+	 }
+	})
 })
 
 
@@ -167,6 +172,11 @@ function load_monthData(y,m, format_date){
 			    
 			    
 			    var dom = document.getElementById("month_chart");
+				//Judge if the echarts object is already instancialized or not
+				var existInstance = echarts.getInstanceByDom(dom);
+				if (existInstance) {
+				        echarts.dispose(dom);
+				}
 			    var myChart = echarts.init(dom);
 			    var app = {};
 			    option = null;
@@ -177,7 +187,6 @@ function load_monthData(y,m, format_date){
 			    	        color: '#000',
 			    	    }
 			    };
-			    
 			    option = {
 			    	    title: {
 			    	        text: 'Time: '+ y +"-"+ m,
@@ -193,8 +202,8 @@ function load_monthData(y,m, format_date){
 			    	    },
 			    	    tooltip : {
 			    	        trigger: 'axis',
-			    	        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-			    	            type : 'line'        // 默认为直线，可选为：'line' | 'shadow'
+			    	        axisPointer : {            
+			    	            type : 'line'     
 			    	        }
 			    	    },
 			    	    toolbox: {
@@ -235,9 +244,15 @@ function load_data(y,m,today_d,format_date){
 	var nameList = new Array();
 	//remember to let the month -1
 	var thisdate = new Date(y,m-1,today_d);
+	var y = thisdate.getFullYear() 
+	var m =  (thisdate.getMonth()+1) 
+    var d = thisdate.getDate();
+	if (m < 10) m = "0" + m;
+	if (d < 10) d = "0" + d;
+	
 	$.ajax({
 		type:"GET",
-		url:"/money/dayAnalysis.do?selectDate="+String(format_date),
+		url:"/money/dayAnalysis.do?selectDate="+ y+'-'+m+'-'+d,
 	    success: function(result){
 			    console.log(result);
 			    allData = result.data;
@@ -257,6 +272,11 @@ function load_data(y,m,today_d,format_date){
 			    
 			    
 			    var dom = document.getElementById("day_chart");
+			    //Judge if the echarts object is already instancialized or not
+				var existInstance = echarts.getInstanceByDom(dom);
+				if (existInstance) {
+				        echarts.dispose(dom);
+				}
 			    var myChart = echarts.init(dom);
 			    var app = {};
 			    option = null;
@@ -283,8 +303,8 @@ function load_data(y,m,today_d,format_date){
 			    	    },
 			    	    tooltip : {
 			    	        trigger: 'axis',
-			    	        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-			    	            type : 'line'        // 默认为直线，可选为：'line' | 'shadow'
+			    	        axisPointer : {      
+			    	            type : 'line'       
 			    	        }
 			    	    },
 			    	    toolbox: {

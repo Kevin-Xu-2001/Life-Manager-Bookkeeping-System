@@ -19,7 +19,7 @@ public interface MoneyMapper {
 	 * 
 	 * @return a list of all the money data
 	 */
-	List<Money> findAll();
+	List<Money> findAll(Integer uid);
 	
 	/**
 	 * 
@@ -31,7 +31,7 @@ public interface MoneyMapper {
 	 * 
 	 * @return a list of all the money spent at that specific date
 	 */
-	List<Money> findByDate(String selectDate);
+	List<Money> findByDate(String selectDate,Integer uid);
 	
 	/**
 	 * 
@@ -39,7 +39,7 @@ public interface MoneyMapper {
 	 * @param month
 	 * @return a list of money objects spent at the specific month
 	 */
-	List<Money> findByMonth(Integer year, Integer month);
+	List<Money> findByMonth(Integer year, Integer month, Integer uid);
 	
 	
 }

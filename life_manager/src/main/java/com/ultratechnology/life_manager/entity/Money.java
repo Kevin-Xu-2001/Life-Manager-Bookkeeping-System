@@ -9,6 +9,7 @@ public class Money implements Serializable{
 	private static final long serialVersionUID = -5514622461865297518L;
 	
 	private Integer id;
+	private Integer uid;
 	private String date_consumed;
 	private Integer year;
 	private Integer month;
@@ -33,6 +34,12 @@ public class Money implements Serializable{
 	}
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	public Integer getUid() {
+		return uid;
+	}
+	public void setUid(Integer uid) {
+		this.uid = uid;
 	}
 	public BigDecimal getAmount() {
 		return amount;
@@ -97,10 +104,12 @@ public class Money implements Serializable{
 	}
 	@Override
 	public String toString() {
-		return "Money [id=" + id + ", date_consumed=" + date_consumed + ", year=" + year + ", month=" + month + ", day="
-				+ day + ", weekday=" + weekday + ", amount=" + amount + ", item=" + item + ", shop_name=" + shop_name
-				+ ", category=" + category + ", payment=" + payment + ", notes=" + notes + "]";
+		return "Money [id=" + id + ", uid=" + uid + ", date_consumed=" + date_consumed + ", year=" + year + ", month="
+				+ month + ", day=" + day + ", weekday=" + weekday + ", amount=" + amount + ", item=" + item
+				+ ", shop_name=" + shop_name + ", category=" + category + ", payment=" + payment + ", notes=" + notes
+				+ "]";
 	}
+	
 	
 	
 

@@ -2,6 +2,8 @@ package com.ultratechnology.life_manager.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +22,11 @@ public class MoneyController extends BaseController{
 	private IMoneyService moneyService;
 	
 	@PostMapping("/add.do")
-	public ResponseResult<Void> handleAdd(Money money){
-		System.out.println("MoneyController: get into HandleAdd function");
-		System.out.println("Money: "+money);
+	public ResponseResult<Void> handleAdd(Money money,HttpSession session){
+	    //Get Uid from Session
+		Integer uid = getUidFromSession(session);
+		System.out.println(uid);
+		money.setUid(uid);
 		Money result = moneyService.createLine(money);
 		System.out.println("The return money is:"+result);
 		return new ResponseResult<Void>(SUCCESS);
@@ -30,16 +34,15 @@ public class MoneyController extends BaseController{
 	
 	
 	@GetMapping("/getAllList.do")
-	public ResponseResult<List<List<Money>>> handleGetAllList(){
-		System.out.println("MoneyController: get into HandleFindAll function");
-		List<List<Money>> allResult = moneyService.findSortedByDateConsumed();
+	public ResponseResult<List<List<Money>>> handleGetAllList(HttpSession session){
+		//Get Uid from Session
+		Integer uid = getUidFromSession(session);
+		//Find all data sorted by the date consumed of one User
+		List<List<Money>> allResult = moneyService.findSortedByDateConsumed(uid);
 		for (List<Money> list : allResult) {
 			System.out.println(list);
 		}
-		ResponseResult<List<List<Money>>> rr = new ResponseResult<List<List<Money>>>(SUCCESS);
-		rr.setData(allResult);
-		rr.setMessage("successfully searched");
-		return rr;
+		return new ResponseResult<List<List<Money>>>(SUCCESS,allResult);
 	}
 	
 	
@@ -54,11 +57,11 @@ public class MoneyController extends BaseController{
 	}
 	
 	@GetMapping("/dayAnalysis.do")
-	public ResponseResult<List<Money>> handleDayAnalysis(String selectDate){
-		System.out.println("MoneyController: get into day analysis function");
-		List<Money> result = moneyService.findMoneyByDate(selectDate);
+	public ResponseResult<List<Money>> handleDayAnalysis(String selectDate,HttpSession session){
+		//Get Uid from Session
+		Integer uid = getUidFromSession(session);
+		List<Money> result = moneyService.findMoneyByDate(selectDate,uid);
 		ResponseResult<List<Money>> rr = null;
-		
 		if(result!=null) {
 		rr = new ResponseResult<List<Money>>(SUCCESS);
 		rr.setData(result);
@@ -70,11 +73,11 @@ public class MoneyController extends BaseController{
 	}
 	
 	@GetMapping("/monthAnalysis.do")
-	public ResponseResult<List<Money>> handleMonthAnalysis(String selectDate){
-		System.out.println("MoneyController: get into month analysis function");
-		List<Money> result = moneyService.findMoneyByMonth(selectDate);
+	public ResponseResult<List<Money>> handleMonthAnalysis(String selectDate,HttpSession session){
+		//Get Uid from Session
+		Integer uid = getUidFromSession(session);
+		List<Money> result = moneyService.findMoneyByMonth(selectDate,uid);
 		ResponseResult<List<Money>> rr = null;
-		
 		if(result!=null) {
 		rr = new ResponseResult<List<Money>>(SUCCESS);
 		rr.setData(result);

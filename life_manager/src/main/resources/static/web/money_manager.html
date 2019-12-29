@@ -33,6 +33,16 @@ $(document).ready(function(){
 	  console.log(format_date);
 	  $("#add_date").val(format_date);
 	  
+	  /* Get the username from the session and display it on the top left*/
+	  $.ajax({
+		  type:"GET",
+		  url:"/user/getUname.do",
+		  success:function(result){
+			  console.log(result)
+			  $("#user").html(result.message)
+		  }
+	  })
+	  
 	  /* Let the submit button to have click function */
 	  $("#add_button").click(function(){
 			post_data = {
@@ -176,18 +186,22 @@ function click_delete(a){
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
   <!-- Brand -->
-  <a class="navbar-brand" href="#">Main</a>
+  <a id="user" class="navbar-brand" href="#"></a>
 
   <!-- Links -->
   <ul class="navbar-nav">
     <li class="nav-item">
-      <a class="nav-link" href="./money_charts2.html">Charts</a>
+      <a class="nav-link" href="./money_manager.html">Money Manager</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="./gesture.html">Analysis</a>
+      <a class="nav-link" href="./money_charts2.html">Money Charts</a>
     </li>
   </ul>
-
+    <!-- Searching bar -->
+  <form class="form-inline" action="/action_page.php">
+	 <input class="form-control mr-sm-2" type="text" placeholder="Search">
+	 <button class="btn btn-success" type="submit">Search</button>
+  </form>
 </nav>
 
 <table class="table">
@@ -250,7 +264,7 @@ function click_delete(a){
 	       <td>Panda Hotpot</td>
 	       <td>Meal</td>
 	       <td>Cash</td>
-	       <td></td>
+	       <td>EXAMPLE</td>
 	       <td><button type="button"  ></button>  </td>
 	     </tr>
 	     <tr>
@@ -260,7 +274,7 @@ function click_delete(a){
 	       <td>Burger King</td>
 	       <td>Meal</td>
 	       <td>Credit Card</td>
-	       <td>Two whopper and a Coke</td>
+	       <td>EXAMPLE</td>
 	     </tr>
 	     <tr>
 	       <td></td>
@@ -269,7 +283,7 @@ function click_delete(a){
 	       <td>Winners</td>
 	       <td>Clothing</td>
 	       <td>Credit Card</td>
-	       <td>Pretty cheap for such good shoes</td>
+	       <td>EXAMPLE</td>
 	       <td></td>
 	     </tr>
    </tbody>
